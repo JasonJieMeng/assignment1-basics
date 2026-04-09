@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import os
 from collections.abc import Iterable
+from cs336_basics.tokenizer import Tokenizer
+from pathlib import Path
+from cs336_basics.train_bpe import train_bpe
 from typing import IO, Any, BinaryIO
 
 import numpy.typing as npt
@@ -559,7 +562,7 @@ def get_tokenizer(
     Returns:
         A BPE tokenizer that uses the provided vocab, merges, and special tokens.
     """
-    raise NotImplementedError
+    return Tokenizer(vocab=vocab, merges=merges, special_tokens=special_tokens)
 
 
 def run_train_bpe(
@@ -589,4 +592,24 @@ def run_train_bpe(
                 representing that <token1> was merged with <token2>.
                 Merges are ordered by order of creation.
     """
-    raise NotImplementedError
+    input_path = Path(input_path)
+
+    if not input_path.exists():
+        raise FileNotFoundError(f"Input file not found: {input_path}")
+
+    if vocab_size <= 0:
+        raise ValueError("vocab_size must be a positive integer")
+
+    if special_tokens is None:
+        # raise ValueError("special_tokens must be provided")
+        special_tokens = []
+
+    vocab, merges = train_bpe(
+        input_path=str(input_path),
+        vocab_size=vocab_size,
+        special_tokens=special_tokens,
+        **kwargs,
+    )
+
+    return vocab, merges
+
