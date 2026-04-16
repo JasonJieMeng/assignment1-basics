@@ -11,10 +11,7 @@ VOCAB_SIZE = 10_000
 SPECIAL_TOKENS = ["<|endoftext|>"]
 
 def get_peak_memory_mb() -> float:
-    # On macOS ru_maxrss is in bytes; on Linux it's usually KB.
     rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    if os.uname().sysname == "Darwin":
-        return rss / (1024 * 1024)
     return rss / 1024
 
 def main():
@@ -24,6 +21,9 @@ def main():
         input_path=INPUT_PATH,
         vocab_size=VOCAB_SIZE,
         special_tokens=SPECIAL_TOKENS,
+        show_progress=True,
+        num_processes=3,
+        num_chunks=12,
     )
 
     elapsed = time.time() - start
@@ -37,7 +37,6 @@ def main():
     with open("artifacts/tinystories_merges.pkl", "wb") as f:
         pickle.dump(merges, f)
 
-    # Human-readable version too
     with open("artifacts/tinystories_vocab.json", "w", encoding="utf-8") as f:
         json.dump(
             {str(k): list(v) for k, v in vocab.items()},

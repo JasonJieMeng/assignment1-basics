@@ -5,7 +5,7 @@ uv run pytest --timeout 10 -v ./tests --junitxml=test_results.xml || true
 echo "Done running tests"
 
 # Set the name of the output tar.gz file
-output_file="cs336-spring2025-assignment-1-submission.zip"
+output_file="cs336-spring2026-assignment-1-submission.zip"
 rm "$output_file" || true
 
 # Compress all files in the current directory into a single zip file
@@ -31,6 +31,9 @@ zip -r "$output_file" . \
     -x '*.pt' \
     -x '*.pth' \
     -x '*.npy' \
-    -x '*.npz'
+    -x '*.npz' \
+    -x 'data/*' \
+    -x '*.ipynb' \
+    -x '*.prof' \
 
 echo "All files have been compressed into $output_file"

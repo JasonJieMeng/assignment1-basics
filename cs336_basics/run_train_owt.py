@@ -4,17 +4,14 @@ import json
 import pickle
 import resource
 
-from train_bpe_tqdm import train_bpe
+from train_bpe import train_bpe
 
 INPUT_PATH = "../data/owt_train.txt"
 VOCAB_SIZE = 32_000
-SPECIAL_TOKENS = []
+SPECIAL_TOKENS = ["<|endoftext|>"]
 
 def get_peak_memory_mb() -> float:
-    # On macOS ru_maxrss is in bytes; on Linux it's usually KB.
     rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-    if os.uname().sysname == "Darwin":
-        return rss / (1024 * 1024)
     return rss / 1024
 
 def main():
@@ -24,7 +21,9 @@ def main():
         input_path=INPUT_PATH,
         vocab_size=VOCAB_SIZE,
         special_tokens=SPECIAL_TOKENS,
-        show_progress=True
+        show_progress=True,
+        num_processes=3,
+        num_chunks=12,
     )
 
     elapsed = time.time() - start
@@ -38,7 +37,6 @@ def main():
     with open("artifacts/owt_merges.pkl", "wb") as f:
         pickle.dump(merges, f)
 
-    # Human-readable version too
     with open("artifacts/owt_vocab.json", "w", encoding="utf-8") as f:
         json.dump(
             {str(k): list(v) for k, v in vocab.items()},

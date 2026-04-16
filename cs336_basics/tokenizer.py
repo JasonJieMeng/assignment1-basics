@@ -109,8 +109,6 @@ class Tokenizer:
 
     def _apply_merges(self, word: Word) -> Word:
         # Apply merges in the same order of creation.
-        # Equivalent greedy implementation: repeatedly merge the adjacent pair
-        # with the smallest merge rank among currently present pairs.
         while len(word) >= 2:
             best_index = -1
             best_rank = None
